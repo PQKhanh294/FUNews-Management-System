@@ -1,0 +1,40 @@
+name: FUNews CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore and Test Backend
+      run: dotnet test ./PhanQuocKhanh_SE18D05_A02_BE/FUNewsManagementSystem.Services.Tests/FUNewsManagementSystem.Services.Tests.csproj --verbosity normal
+
+    - name: Restore and Test Frontend
+      run: dotnet test ./PhanQuocKhanh_SE18D05_A02_FE/FUNewsManagementSystem.WebClient.Tests/FUNewsManagementSystem.WebClient.Tests.csproj --verbosity normal
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and Push Backend Image
+      run: |
+        docker build -t kaiphan294/funews-api:latest ./PhanQuocKhanh_SE18D05_A02_BE
+        docker push kaiphan294/funews-api:latest
+
+    - name: Build and Push Frontend Image
+      run: |
+        docker build -t kaiphan294/funews-webclient:latest ./PhanQuocKhanh_SE18D05_A02_FE
+        docker push kaiphan294/funews-webclient:latest
