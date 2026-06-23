@@ -1,0 +1,38 @@
+@inject IConfiguration Configuration
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — FU News</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 60% 0%, rgba(225,29,72,.18) 0%, transparent 55%),
+                        radial-gradient(ellipse at 0% 100%, rgba(99,102,241,.14) 0%, transparent 55%),
+                        linear-gradient(160deg, #07090f 0%, #0d1117 40%, #070b12 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-page-wrap">
+        @RenderBody()
+    </div>
+
+    <script>
+        window.FUNEWS_API_BASE = '@(Configuration["ApiBaseUrl"] ?? "https://localhost:7101")';
+        window.FUNEWS_GOOGLE_CLIENT_ID = '@(Configuration["GoogleAuth:ClientId"] ?? string.Empty)';
+    </script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

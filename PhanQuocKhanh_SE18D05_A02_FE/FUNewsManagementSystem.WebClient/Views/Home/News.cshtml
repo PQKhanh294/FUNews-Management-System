@@ -1,0 +1,113 @@
+@{
+    ViewData["Title"] = "News Articles";
+}
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <span class="page-eyebrow">Staff workspace</span>
+            <h1 class="page-title">News Articles</h1>
+            <p class="page-subtitle">Create, edit, publish and remove articles with rich content and tags.</p>
+        </div>
+        <div class="page-actions">
+            <button class="btn btn-primary" id="btnCreateNews" type="button">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+                </svg>
+                New Article
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="page-section">
+        <table class="table table-hover w-100" id="newsTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th style="width:110px;"></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="newsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form id="newsForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Article</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" id="newsId" />
+                    <input type="hidden" id="approvalStatus" />
+                    <div class="alert alert-danger d-none" id="newsFormError" role="alert"></div>
+                    <div class="row g-5">
+                        @* Main Editor Column *@
+                        <div class="col-lg-8">
+                            <div class="mb-4">
+                                <label class="form-label" style="font-weight:600">Article Title</label>
+                                <input class="form-control form-control-lg" id="newsTitle" placeholder="e.g. University FU Celebrates Success..." 
+                                       style="font-family:'Playfair Display',serif; font-size:1.5rem;" required />
+                                <div class="invalid-feedback" id="newsTitleError"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label" style="font-weight:600">Headline / Subtitle</label>
+                                <textarea class="form-control" id="headline" placeholder="Brief description shown in listings..." rows="2" required></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label" style="font-weight:600">Article Body</label>
+                                <div class="rich-text-editor" id="newsContentEditor" style="min-height:250px;"></div>
+                                <textarea class="d-none" id="newsContent"></textarea>
+                            </div>
+                        </div>
+
+                        @* Sidebar Settings *@
+                        <div class="col-lg-4">
+                            <div class="surface-panel p-4" style="background:var(--bg-secondary); border-radius:var(--radius); border:1px solid rgba(255,255,255,.05)">
+                                <h6 class="mb-4" style="font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:1px; opacity:.7">Publishing Settings</h6>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label text-sm">Status</label>
+                                    <select class="form-select" id="newsStatus">
+                                        <option value="true">Active (Submit for approval)</option>
+                                        <option value="false">Inactive (Save as draft)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label text-sm">Category</label>
+                                    <select class="form-select" id="categoryId" required></select>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label text-sm">Tags</label>
+                                    <select class="form-select" id="tagIds" multiple style="width:100%"></select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label text-sm">Source</label>
+                                    <input class="form-control" id="newsSource" placeholder="Source URL or name" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveNews">Save article</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/news-management.js" asp-append-version="true"></script>
+}

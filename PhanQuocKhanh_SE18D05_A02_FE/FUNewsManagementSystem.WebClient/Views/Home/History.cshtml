@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "My Articles";
+}
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <span class="page-eyebrow">Staff</span>
+            <h1 class="page-title">My Articles</h1>
+            <p class="page-subtitle">Articles you have created, ordered by most recent.</p>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="page-section">
+        <table class="table table-hover w-100" id="historyTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Approval</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/history.js" asp-append-version="true"></script>
+}

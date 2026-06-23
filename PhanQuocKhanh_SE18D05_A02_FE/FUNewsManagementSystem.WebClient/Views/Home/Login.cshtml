@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Sign in";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="auth-layout">
+    @* LEFT: Editorial copy panel *@
+    <div class="auth-copy">
+        <span class="section-label">FU News Management System</span>
+        <h2>The newsroom<br>for <em>modern</em><br>journalism.</h2>
+        <p>Admin manages accounts &amp; analytics. Staff writes, edits, and publishes articles with categories, tags, and rich content.</p>
+        <div class="auth-checklist">
+            <span>JWT secured API</span>
+            <span>OData search &amp; filter</span>
+            <span>Rich text editor</span>
+            <span>Google Sign-In</span>
+            <span>Role-based access</span>
+        </div>
+    </div>
+
+    @* RIGHT: Login panel *@
+    <div class="auth-panel">
+        <div class="panel-heading">
+            <span class="section-label">Account access</span>
+            <h1>Sign in</h1>
+        </div>
+
+        <form id="loginForm" novalidate>
+            <div class="mb-3">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" id="email" name="email" type="email"
+                       autocomplete="username" placeholder="your@fpt.edu.vn" required />
+            </div>
+            <div class="mb-4">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-control" id="password" name="password" type="password"
+                       autocomplete="current-password" placeholder="••••••••" required />
+            </div>
+            <button class="btn btn-primary w-100" type="submit" id="btnSignIn"
+                    style="height:42px; font-size:14px;">
+                Sign in with password
+            </button>
+        </form>
+
+        <div class="auth-divider"><span>or</span></div>
+
+        <div id="googleLoginHost" class="google-login-host"></div>
+        <p class="google-config-message d-none" id="googleConfigMessage">
+            Google Sign-In is not configured.
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="~/js/login.js" asp-append-version="true"></script>
+}

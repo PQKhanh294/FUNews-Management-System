@@ -1,0 +1,219 @@
+@inject IConfiguration Configuration
+@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "News";
+    var metaDescription = ViewData["MetaDescription"]?.ToString()
+        ?? "FU News Management System - campus news for the FPT University community.";
+    var robots = ViewData["Robots"]?.ToString() ?? "index,follow";
+    var canonicalUrl = ViewData["CanonicalUrl"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@pageTitle - FU News</title>
+    <meta name="description" content="@metaDescription" />
+    <meta name="robots" content="@robots" />
+    @if (!string.IsNullOrWhiteSpace(canonicalUrl))
+    {
+        <link rel="canonical" href="@canonicalUrl" />
+    }
+    @await RenderSectionAsync("Head", required: false)
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+
+    <div class="app-shell">
+
+        @* ══ TOP NAVIGATION BAR ══ *@
+        <nav class="app-navbar" role="navigation" aria-label="Primary navigation">
+
+            @* Brand *@
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index" aria-label="FU News home">
+                <span class="brand-logo">FU</span>
+                <span class="brand-name">
+                    FU News
+                    <small>Management System</small>
+                </span>
+            </a>
+
+            @* Nav links *@
+            <ul class="navbar-nav" id="mainMenu">
+                @* Public news — always visible *@
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M1.5 2.5A1.5 1.5 0 0 1 3 1h10a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 13 15H3a1.5 1.5 0 0 1-1.5-1.5zm1 0v11A.5.5 0 0 0 3 14h10a.5.5 0 0 0 .5-.5v-11A.5.5 0 0 0 13 2H3a.5.5 0 0 0-.5.5M4.5 4a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1z"/>
+                        </svg>
+                        <span class="nav-label">News</span>
+                    </a>
+                </li>
+
+                @* Category filter dropdown — populated by JS *@
+                <li class="nav-item nav-dropdown" id="categoryMenu">
+                    <a class="nav-link nav-dropdown-toggle" role="button" tabindex="0">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3A1.5 1.5 0 0 1 15 10.5v3A1.5 1.5 0 0 1 13.5 15h-3A1.5 1.5 0 0 1 9 13.5z"/>
+                        </svg>
+                        <span class="nav-label">Categories</span>
+                        <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" style="opacity:.5; margin-left:2px" aria-hidden="true">
+                            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                        </svg>
+                    </a>
+                    <div class="nav-dropdown-menu" id="categoryDropdown" aria-label="News categories"></div>
+                </li>
+
+                @* Admin & Staff *@
+                <li class="nav-item role-admin-staff d-none">
+                    <a class="nav-link" asp-controller="Home" asp-action="News">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+                            <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0M7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0"/>
+                        </svg>
+                        <span class="nav-label">Articles</span>
+                    </a>
+                </li>
+                <li class="nav-item role-admin d-none">
+                    <a class="nav-link" asp-controller="Home" asp-action="Approval">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+                            <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                        </svg>
+                        <span class="nav-label">Approval</span>
+                    </a>
+                </li>
+
+                @* Admin only *@
+                <li class="nav-item role-admin d-none">
+                    <a class="nav-link" asp-controller="Home" asp-action="Dashboard">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M4 11H2v3h2zm5-4H7v7h2zm5-5v12h-2V2zm-2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM6 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm-5 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1z"/>
+                        </svg>
+                        <span class="nav-label">Report</span>
+                    </a>
+                </li>
+                <li class="nav-item role-admin d-none">
+                    <a class="nav-link" asp-controller="Home" asp-action="Accounts">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                        </svg>
+                        <span class="nav-label">Accounts</span>
+                    </a>
+                </li>
+            </ul>
+
+            @* Right side actions *@
+            <div class="navbar-end">
+                @* Logged-in user menu *@
+                <div class="auth-only d-none" id="userMenuWrap">
+                    <div class="dropdown">
+                        <button class="user-menu-btn" type="button" id="userMenuBtn"
+                                data-bs-toggle="dropdown" aria-expanded="false" aria-label="User menu">
+                            <span class="user-avatar" id="userInitial">?</span>
+                            <span id="userDisplayName" style="max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+                            <span class="nav-role-badge d-none" id="navRoleBadge"></span>
+                            <svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor" style="opacity:.45" aria-hidden="true">
+                                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                            </svg>
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" asp-controller="Home" asp-action="Profile">
+                                    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" class="me-1" aria-hidden="true">
+                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.029 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                                    </svg>
+                                    Profile
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <button class="dropdown-item text-danger" id="btnLogout" type="button">
+                                    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" class="me-1" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                                        <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                                    </svg>
+                                    Sign out
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                @* Guest sign-in *@
+                <a class="btn-navbar-signin guest-only" asp-controller="Home" asp-action="Login">
+                    Sign in
+                </a>
+            </div>
+        </nav>
+
+        @* ══ MAIN CONTENT ══ *@
+        <main role="main" class="app-main">
+            @RenderBody()
+        </main>
+
+        @* ══ FOOTER ══ *@
+        <footer class="app-footer">
+            <span>&copy; 2026 FU News Management System</span>
+            <span>ASP.NET Core &middot; OData &middot; JWT</span>
+        </footer>
+
+    </div>
+
+    @* Toast host *@
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastHost"></div>
+
+    <script>
+        window.FUNEWS_API_BASE = '@(Configuration["ApiBaseUrl"] ?? "https://localhost:7101")';
+        window.FUNEWS_GOOGLE_CLIENT_ID = '@(Configuration["GoogleAuth:ClientId"] ?? string.Empty)';
+    </script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Highlight active nav link based on current path
+        (function () {
+            const path = window.location.pathname.toLowerCase();
+            document.querySelectorAll('.app-navbar .nav-link').forEach(function (el) {
+                const href = (el.getAttribute('href') || '').toLowerCase();
+                if (href && href !== '#' && (path === href || (href !== '/' && path.startsWith(href)))) {
+                    el.classList.add('active');
+                }
+            });
+            if (path === '/') {
+                const homeLink = document.querySelector('.app-navbar .nav-link[href="/"]');
+                if (homeLink) homeLink.classList.add('active');
+            }
+
+            // Category dropdown toggle (click-friendly for all devices)
+            const dd = document.getElementById('categoryMenu');
+            if (dd) {
+                const toggle = dd.querySelector('.nav-dropdown-toggle');
+                if (toggle) {
+                    toggle.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        dd.classList.toggle('open');
+                    });
+                }
+                document.addEventListener('click', function (e) {
+                    if (!dd.contains(e.target)) dd.classList.remove('open');
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+@model FUNewsManagementSystem.WebClient.Models.PublicNewsPageViewModel
+@{
+    ViewData["Title"] = "FU Campus News";
+    ViewData["MetaDescription"] = "Latest approved campus news, academic updates, events and community stories from FPT University.";
+    ViewData["CanonicalUrl"] = $"{Context.Request.Scheme}://{Context.Request.Host}/";
+    ViewData["Robots"] = string.IsNullOrWhiteSpace(Model.Search) ? "index,follow" : "noindex,follow";
+}
+
+@section Head {
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="FU Campus News" />
+    <meta property="og:description" content="@ViewData["MetaDescription"]" />
+    <meta property="og:url" content="@ViewData["CanonicalUrl"]" />
+}
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <span class="page-eyebrow">Latest Articles</span>
+            <h1 class="page-title">FU Campus News</h1>
+            <p class="page-subtitle">All published articles across every category.</p>
+        </div>
+        <form class="page-actions public-search-form" method="get" action="/">
+            @if (Model.SelectedCategoryID is not null)
+            {
+                <input type="hidden" name="category" value="@Model.SelectedCategoryID" />
+            }
+            <label class="visually-hidden" for="publicSearch">Search articles</label>
+            <input class="form-control" id="publicSearch" name="search" value="@Model.Search"
+                   placeholder="Search articles..." autocomplete="off" />
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+</div>
+
+<div class="app-content">
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@Model.ErrorMessage</div>
+    }
+
+    <div class="news-grid" id="publicNewsList">
+        @if (Model.Articles.Count == 0)
+        {
+            <div class="surface-panel public-empty-state">No published articles found.</div>
+        }
+        else
+        {
+            @for (var index = 0; index < Model.Articles.Count; index++)
+            {
+                var article = Model.Articles[index];
+                var articleUrl = Url.RouteUrl("NewsArticle", new { id = article.NewsArticleID, slug = article.CanonicalSlug });
+                <article class="news-card @(index == 0 ? "news-card--featured" : string.Empty)">
+                    <div class="news-card-body">
+                        <div class="news-card-category">@article.DisplayCategory</div>
+                        <h2><a class="news-card-title-link" href="@articleUrl">@article.DisplayTitle</a></h2>
+                        <div class="news-card-meta">
+                            @if (!string.IsNullOrWhiteSpace(article.DisplayAuthor))
+                            {
+                                <span>By @article.DisplayAuthor</span>
+                            }
+                            @if (article.CreatedDate is not null)
+                            {
+                                <time datetime="@article.CreatedDate.Value.ToString("O")">@article.CreatedDate.Value.ToString("dd MMM yyyy")</time>
+                            }
+                        </div>
+                        <p>@article.Headline</p>
+                        <a class="btn btn-sm btn-outline-primary" href="@articleUrl">Read article <span aria-hidden="true">&rarr;</span></a>
+                    </div>
+                </article>
+            }
+        }
+    </div>
+</div>

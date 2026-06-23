@@ -1,0 +1,33 @@
+@{
+    ViewData["Title"] = "Approval Queue";
+}
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <div>
+            <span class="page-eyebrow">Admin</span>
+            <h1 class="page-title">Approval Queue</h1>
+            <p class="page-subtitle">Articles pending your review and approval.</p>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="page-section">
+        <table class="table table-hover w-100" id="approvalTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Created By</th>
+                    <th>Created</th>
+                    <th style="width:140px;"></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/approval.js" asp-append-version="true"></script>
+}
